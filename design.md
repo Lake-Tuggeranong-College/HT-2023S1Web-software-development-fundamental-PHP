@@ -11,6 +11,8 @@ Users will need to store
 - Hashed password
 - Access Level (User vs Administrator)
 - Status (active or disabled)
+- Cart Items
+- Purchase History
 ## Product Management
 Administrators will be able to add, remove, or edit products.
 
@@ -20,6 +22,7 @@ Products will have
 - A Price
 - A Description
 - Quantity
+- Current Product Stock
 
 # Behaviour - User Journey
 
