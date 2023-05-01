@@ -73,5 +73,5 @@ journey
 
 # Planning Diagram - WireFrames
 
-![Mainpage wireframe](images/)
+![Mainpage wireframe](images/wireframe/wireframe.png)
 
