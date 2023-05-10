@@ -63,4 +63,47 @@ IF ($_SERVER["REQUEST_METHOD"] == "POST") { //will return true when user presses
     
 }
 ?>
+<?php
+// Back End
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = sanitiseData($_POST['username']);
+    $Password = sanitiseData($_POST['hashedPassword']);
+    $FirstName = sanitiseData($_POST['FirstName']);
+    $SecondName = sanitiseData($_POST['SecondName']);
+    $Address = sanitiseData($_POST['Address']);
+    $PhoneNumber = sanitiseData($_POST['PhoneNumber']);
+
+    $query = $conn->query("SELECT COUNT(*) FROM Customers WHERE EmailAdress='$username'");
+
+    $data = $query->fetchArray();
+    $numberOfUsers = (int)$data[0];
+
+    if ($numberOfUsers > 0) {  // username already exists.
+        echo "Sorry, that username already exists";
+    }else{
+        //the username enter is unique (doesn't already exist)
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $sqlStmt = $conn->prepare("INSERT INTO Customers (EmailAdress, HashedPassword, FirstName, SecondName, Adress, PhoneNumber) VALUES (:EmailAddress, :HashedPassword, :FirstName, :SecondName, :Address, :PhoneNumber)");
+        $sqlStmt->bindParam(':EmailAddress', $username);
+        $sqlStmt->bindParam(':HashedPassword', $hashedPassword);
+        $sqlStmt->bindParam(':FirstName', $firstName);
+        $sqlStmt->bindParam(':SecondName', $secondName);
+        $sqlStmt->bindParam(':Address', $address);
+        $sqlStmt->bindParam(':PhoneNumber', $phoneNumber);
+        $sqlStmt->execute();
+
+        // start or resume a session
+        session_start();
+
+// store data in the session
+        $_SESSION['username'] = 'johndoe';
+        $_SESSION['cart'] = array('item1', 'item2', 'item3');
+
+// retrieve data from the session
+        $username = $_SESSION['username'];
+        $cart = $_SESSION['cart'];
+    }
+}
+?>
 
