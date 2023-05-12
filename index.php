@@ -1,13 +1,12 @@
 <?php include "template.php"?>
-<?php include 'login.php'; ?>
+<?php include "login.php"; ?>
     <title>PHP Template</title>
 <body>
-<h1>Heading</h1>
-<h1>among us</h1>
+<h1><em>Amog us</em></h1>
 <div class="container-fluid">
     <div class="row">
         <div class="col-6">
-            Column 1
+
         </div>
         <div class="col-6">
             <?php if (!isset($_SESSION["EmailAddress"])) : ?>
@@ -32,5 +31,4 @@
 
 <?php echo footer() ?>
 </body>
-<script src="js/bootstrap.bundle.min.js" ></script>
 </html>
