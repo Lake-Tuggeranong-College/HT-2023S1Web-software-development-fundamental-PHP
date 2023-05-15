@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,14 +29,43 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="register.php">Register</a>
                 </li>
+                <?php
+                if (isset($_SESSION["FirstName"])) {
+                    echo '<li class="nav-item" ><a class="nav-link" href = "orderForm.php"> Order Form </a ></li >';
+                    echo '<li class="nav-item" ><a class="nav-link" href = "invoiceList.php"> Invoice list</a ></li >';
+                } else {
+                    echo '<li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>';
+                }
+                if (isset($_SESSION["AccessLevel"])) {
+                    if ($_SESSION["AccessLevel"] == 1) {
+                        ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Product Management
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="productAdd.php">Add Products</a></li>
+                                <li><a class="dropdown-item" href="productList.php">Product List</a></li>
+                            </ul>
+                        </li>
+                        <?php
+                    }
+                }
+
+                ?>
             </ul>
         </div>
+        <?php
+        if (isset($_SESSION["FirstName"])) {
+            echo '<div class="bg-light">Welcome, ' . $_SESSION["FirstName"] . '!<a class="nav-link" href="logout.php">Logout</a></div>';
+        }
+        ?>
     </div>
 </nav>
 <script src="js/bootstrap.bundle.min.js" ></script>
 <?php
 
-session_start();
 $conn = new SQLite3("DB") or die("unable to open database");
 //timezone stuff
 $productNames = array("product1"=>"Darth Vader Helmet", "product2"=>"Grogu Plush", "product3"=>"ROTJ Jigsaw", "product4"=>"Aftermath", "product5"=>"Alphabet Squadron");
