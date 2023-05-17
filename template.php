@@ -20,15 +20,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="contact.php">Contact us</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="invoicelist.php">Invoice</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="orderForm.php">Order Form</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="register.php">Register</a>
-                </li>
                 <?php
                 if (isset($_SESSION["FirstName"])) {
                     echo '<li class="nav-item" ><a class="nav-link" href = "orderForm.php"> Order Form </a ></li >';

@@ -4,6 +4,9 @@
 <title>Add Products</title>
 <h1 class='text-primary'>Add Products</h1>
 
+<?php
+$query = $conn->query("SELECT DISTINCT category FROM Products");
+?>
 
     <!-- Front End -->
 
@@ -21,7 +24,13 @@ if ($_SESSION['AccessLevel'] == 1) {
                     <h2>Products Details</h2>
                     <p>Product Name<input type="text" name="prodName" class="form-control" required="required"></p>
                     <p>Product Category
-                        <input type="text" name="prodCategory" class="form-control" required="required">
+                        <select name="prodCategory">
+                            <?php
+                            while ($row = $query->fetchArray()) {
+                                echo '<option>' . $row[0] . '</option>';
+                            }
+                            ?>
+                        </select>
                     </p>
                     <p>Quantity<input type="number" name="prodQuantity" class="form-control" required="required"></p>
                 </div>
@@ -63,5 +72,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Sorry, product already taken";
     } else {
 // Product Registration commences
+
+        // Image details
+        $file = $_FILES['prodImage'];
+        $fileName = $_FILES['prodImage']['name'];
+        $fileTmpName = $_FILES['prodImage']['tmp_name'];
+        $fileSize = $_FILES['prodImage']['size'];
+        $fileError = $_FILES['prodImage']['error'];
+        $fileType = $_FILES['prodImage']['type'];
+
+        // defining what type of file is allowed
+        // We separate the file, and obtain the file extension.
+        $fileExtension = explode('.', $fileName);
+        $fileActualExtension = strtolower(end($fileExtension));
+
+        $allowedExtensions = array('jpg', 'jpeg', 'png', 'pdf');
+
+//We ensure the extension is allowable
+        if (in_array($fileActualExtension, $allowedExtensions)) {
+            if ($fileError === 0) {
+                // File is smaller than arbitrary size
+                if ($fileSize < 10000000000) {
+                    //file name is now a unique ID based on time with IMG- preceeding it, followed by the file type.
+                    $fileNameNew = uniqid('IMG-', True) . "." . $fileActualExtension;
+                    //upload location
+                    $fileDestination = 'images/productImages/' . $fileNameNew;
+                    // Upload file
+                    move_uploaded_file($fileTmpName, $fileDestination);
+
+                    // Write details to database
+                    $sql = "INSERT INTO Products (ProductName, Category, Quantity, ProductPrice, Image, Code) VALUES (:newProdName, :newProdCategory, :newProdQuantity, :newProdPrice, :newProdImage, :newProdCode)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindValue(':newProdName', $prodName);
+                    $stmt->bindValue(':newProdCategory', $prodCategory);
+                    $stmt->bindValue(':newProdQuantity', $prodQuantity);
+                    $stmt->bindValue(':newProdPrice', $prodPrice);
+                    $stmt->bindValue(':newProdImage', $fileNameNew);
+                    $stmt->bindValue(':newProdCode', $prodCode);
+                    $stmt->execute();
+                    header("location:index.php");
+                }
+            }
+        }
     }
 }
