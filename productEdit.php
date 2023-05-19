@@ -60,7 +60,7 @@ if ($_SESSION['AccessLevel'] == 1) {
                 <p>Product Code<input type="text" name="prodCode" class="form-control" required="required"
                                       value="<?= $prodCode ?>"></p>
                 <p>Product Picture
-                    <img src='images/productImages/<?= $prodImage ?>' width='100' height='100'>
+                    <img src='images/siteImages/<?= $prodImage ?>' width='100' height='100'>
                     <input type="file" name="prodImage" class="form-control" required="required"></p>
             </div>
         </div>
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 //file name is now a unique ID based on time with IMG- preceeding it, followed by the file type.
                 $fileNameNew = uniqid('IMG-', True) . "." . $fileActualExtension;
                 //upload location
-                $fileDestination = 'images/productImages/' . $fileNameNew;
+                $fileDestination = 'images/siteImages/' . $fileNameNew;
                 // Upload file
                 move_uploaded_file($fileTmpName, $fileDestination);
 
@@ -161,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 //file name is now a unique ID based on time with IMG- preceeding it, followed by the file type.
                 $fileNameNew = uniqid('IMG-', True) . "." . $fileActualExtension;
                 //upload location
-                $fileDestination = 'images/productImages/' . $fileNameNew;
+                $fileDestination = 'images/siteImages/' . $fileNameNew;
                 // Upload file
                 move_uploaded_file($fileTmpName, $fileDestination);
 
