@@ -5,7 +5,7 @@
 <h1 class='text-primary'>Add Products</h1>
 
 <?php
-$query = $conn->query("SELECT DISTINCT category FROM Products");
+$query = $conn->query("SELECT DISTINCT Category FROM Products");
 ?>
 
     <!-- Front End -->
@@ -23,7 +23,8 @@ if ($_SESSION['AccessLevel'] == 1) {
                 <div class="col-md-6">
                     <h2>Products Details</h2>
                     <p>Product Name<input type="text" name="prodName" class="form-control" required="required"></p>
-                    <p>Product Category
+                    <p>Product Category</p>
+                        <input type="text" name="prodCategory" class="form-control" required="required">
                         <select name="prodCategory">
                             <?php
                             while ($row = $query->fetchArray()) {
@@ -64,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prodCode = sanitiseData($_POST['prodCode']);
 
 //check if product exists.
-    $query = $conn->query("SELECT COUNT(*) FROM Products WHERE code='$prodCode'");
+    $query = $conn->query("SELECT COUNT(*) FROM Products WHERE Code='$prodCode'");
     $data = $query->fetchArray();
     $numberOfProducts = (int)$data[0];
 
@@ -96,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     //file name is now a unique ID based on time with IMG- preceeding it, followed by the file type.
                     $fileNameNew = uniqid('IMG-', True) . "." . $fileActualExtension;
                     //upload location
-                    $fileDestination = 'images/productImages/' . $fileNameNew;
+                    $fileDestination = 'images/siteImages/' . $fileNameNew;
                     // Upload file
                     move_uploaded_file($fileTmpName, $fileDestination);
 
@@ -116,3 +117,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+?>

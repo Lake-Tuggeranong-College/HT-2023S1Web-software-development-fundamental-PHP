@@ -128,3 +128,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+<?php
+// Back End
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//    Customer Details
+    $newName = sanitiseData($_POST['prodName']);
+    $newCategory = sanitiseData($_POST['prodCategory']);
+    $newQuantity = sanitiseData($_POST['prodQuantity']);
+    $newPrice = sanitiseData($_POST['prodPrice']);
+    $newCode = sanitiseData($_POST['prodCode']);
+
+    // Image details
+    $file = $_FILES['prodImage'];
+    $fileName = $_FILES['prodImage']['name'];
+    $fileTmpName = $_FILES['prodImage']['tmp_name'];
+    $fileSize = $_FILES['prodImage']['size'];
+    $fileError = $_FILES['prodImage']['error'];
+    $fileType = $_FILES['prodImage']['type'];
+
+    // defining what type of file is allowed
+    // We separate the file, and obtain the file extension.
+    $fileExtension = explode('.', $fileName);
+    $fileActualExtension = strtolower(end($fileExtension));
+
+    $allowedExtensions = array('jpg', 'jpeg', 'png', 'pdf');
+
+    //We ensure the extension is allowable
+    if (in_array($fileActualExtension, $allowedExtensions)) {
+        if ($fileError === 0) {
+            // File is smaller than arbitrary size
+            if ($fileSize < 10000000000) {
+                //file name is now a unique ID based on time with IMG- preceeding it, followed by the file type.
+                $fileNameNew = uniqid('IMG-', True) . "." . $fileActualExtension;
+                //upload location
+                $fileDestination = 'images/productImages/' . $fileNameNew;
+                // Upload file
+                move_uploaded_file($fileTmpName, $fileDestination);
+
+                // Write details to database
+                $sql = "UPDATE Products SET ProductName= :newProdName, Category= :newProdCategory, Quantity= :newProdQuantity, ProductPrice= :newProdPrice, Image= :newProdImage, Code= :newProdCode WHERE code='$prodCode'";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindValue(':newProdName', $newName);
+                $stmt->bindValue(':newProdCategory', $newCategory);
+                $stmt->bindValue(':newProdQuantity', $newQuantity);
+                $stmt->bindValue(':newProdPrice', $newPrice);
+                $stmt->bindValue(':newProdImage', $fileNameNew);
+                $stmt->bindValue(':newProdCode', $newCode);
+                $stmt->execute();
+                header("location:productList.php");
+            } else {
+                echo "Your image is too big!";
+            }
+        } else {
+            echo "there was an error uploading your image!";
+        }
+    } else {
+        echo "You cannot upload files of this type!";
+    }
+}
+
+?>

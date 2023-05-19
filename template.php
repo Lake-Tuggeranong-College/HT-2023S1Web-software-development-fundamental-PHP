@@ -37,7 +37,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="productAdd.php">Add Products</a></li>
-                                <li><a class="dropdown-item" href="productList.php">Product List</a></li>
+                                <li><a class="dropdown-item" href="productlist.php">Product List</a></li>
                             </ul>
                         </li>
                         <?php
