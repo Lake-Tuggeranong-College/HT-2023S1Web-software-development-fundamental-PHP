@@ -22,7 +22,7 @@
                 <p>Please enter More Personal Details:</p>
                 <p>First Name<input type="text" name="FirstName" class="form-control" required="required"></p>
                 <p>Second Name<input type="text" name="SecondName" class="form-control" required="required"></p>
-                <p>Address<input type="text" name="Adress" class="form-control" required="required"></p>
+                <p>Address<input type="text" name="Address" class="form-control" required="required"></p>
                 <p>Phone Number<input type="text" name="PhoneNumber" class="form-control" required="required"></p>
             </div>
         </div>
@@ -41,7 +41,7 @@ IF ($_SERVER["REQUEST_METHOD"] == "POST") { //will return true when user presses
     $PhoneNumber = sanitiseData($_POST['PhoneNumber']);
 
     //check if the username already exists in the database
-    $query = $conn->query("SELECT COUNT(*) FROM customers WHERE EmailAdress= $username");
+    $query = $conn->query("SELECT COUNT(*) FROM customers WHERE EmailAddress= '$username'");
     $data = $query->fetchArray();
     $numberOfUsers = (int)$data[0];
 
@@ -51,9 +51,9 @@ IF ($_SERVER["REQUEST_METHOD"] == "POST") { //will return true when user presses
         //the username enter is unique (doesn't already exist in database)
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $SQLStmt = $conn->prepare("INSERT INTO customers (EmailAdress, hashedPassword, FirstName, SecondName, Adress, PhoneNumber) VALUES (:EmailAdress, :hashedPassword, :FirstName, :SecondName, :Adress, :PhoneNumber)");
-        $SQLStmt->bindParam(':EmailAdress', $username);
-        $SQLStmt->bindParam(':hashedPassword', $hashedPassword);
+        $SQLStmt = $conn->prepare("INSERT INTO customers (EmailAddress, HashedPassword, FirstName, SecondName, Address, PhoneNumber) VALUES (:EmailAddress, :HashedPassword, :FirstName, :SecondName, :Address, :PhoneNumber)");
+        $SQLStmt->bindParam(':EmailAddress', $username);
+        $SQLStmt->bindParam(':HashedPassword', $hashedPassword);
         $SQLStmt->bindParam(':FirstName', $FirstName);
         $SQLStmt->bindParam(':SecondName', $SecondName);
         $SQLStmt->bindParam(':Address', $Address);
@@ -63,47 +63,3 @@ IF ($_SERVER["REQUEST_METHOD"] == "POST") { //will return true when user presses
     
 }
 ?>
-<?php
-// Back End
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = sanitiseData($_POST['username']);
-    $Password = sanitiseData($_POST['hashedPassword']);
-    $FirstName = sanitiseData($_POST['FirstName']);
-    $SecondName = sanitiseData($_POST['SecondName']);
-    $Address = sanitiseData($_POST['Address']);
-    $PhoneNumber = sanitiseData($_POST['PhoneNumber']);
-
-    $query = $conn->query("SELECT COUNT(*) FROM Customers WHERE EmailAdress='$username'");
-
-    $data = $query->fetchArray();
-    $numberOfUsers = (int)$data[0];
-
-    if ($numberOfUsers > 0) {  // username already exists.
-        echo "Sorry, that username already exists";
-    }else{
-        //the username enter is unique (doesn't already exist)
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $sqlStmt = $conn->prepare("INSERT INTO Customers (EmailAdress, HashedPassword, FirstName, SecondName, Adress, PhoneNumber) VALUES (:EmailAddress, :HashedPassword, :FirstName, :SecondName, :Address, :PhoneNumber)");
-        $sqlStmt->bindParam(':EmailAddress', $username);
-        $sqlStmt->bindParam(':HashedPassword', $hashedPassword);
-        $sqlStmt->bindParam(':FirstName', $firstName);
-        $sqlStmt->bindParam(':SecondName', $secondName);
-        $sqlStmt->bindParam(':Address', $address);
-        $sqlStmt->bindParam(':PhoneNumber', $phoneNumber);
-        $sqlStmt->execute();
-
-        // start or resume a session
-        session_start();
-
-// store data in the session
-        $_SESSION['username'] = 'johndoe';
-        $_SESSION['cart'] = array('item1', 'item2', 'item3');
-
-// retrieve data from the session
-        $username = $_SESSION['username'];
-        $cart = $_SESSION['cart'];
-    }
-}
-?>
-
