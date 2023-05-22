@@ -13,11 +13,11 @@ if (isset($_GET["prodCode"])) {
 
 $query = $conn->query("SELECT * FROM products WHERE code='$prodCode'");
 $prodData = $query->fetchArray();
-$prodName = $prodData[1];
-$prodPrice = $prodData[2];
-$prodCategory = $prodData[3];
-$prodQuantity = $prodData[4];
-$prodImage = $prodData[5];
+$prodName = $prodData["ProductName"];
+$prodPrice = $prodData["ProductPrice"];
+$prodCategory = $prodData["Category"];
+$prodQuantity = $prodData["Quantity"];
+$prodImage = $prodData["Image"];
 ?>
 
 <h1 class='text-primary'>Edit Product - <?= $prodName ?></h1>
@@ -104,7 +104,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $fileDestination = 'images/siteImages/' . $fileNameNew;
                 // Upload file
                 move_uploaded_file($fileTmpName, $fileDestination);
-
                 // Write details to database
                 $sql = "UPDATE Products SET ProductName= :newProdName, Category= :newProdCategory, Quantity= :newProdQuantity, ProductPrice= :newProdPrice, Image= :newProdImage, Code= :newProdCode WHERE code='$prodCode'";
                 $stmt = $conn->prepare($sql);
@@ -128,7 +127,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
+
 <?php
+/*
 // Back End
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 //    Customer Details
@@ -186,7 +188,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "You cannot upload files of this type!";
     }
 }
-
+*/
 ?>
+
 
 
