@@ -10,7 +10,7 @@ if (($handle = fopen("orders.csv", "r")) !== FALSE) {
 // Customer Details
         $cusNameFirst = $data[0];
         $cusNameSecond = $data[1];
-        echo "<p> <a href='invoice.php?invoiceNumber=".$currentRow ."''>" . $cusNameFirst." ".$cusNameSecond."</a></p>";
+        echo "<p> <a href='invoice.php.old?invoiceNumber=".$currentRow ."''>" . $cusNameFirst." ".$cusNameSecond."</a></p>";
         $currentRow++; //Add one to the current row
     }
     fclose($handle); //closes the file

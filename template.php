@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
+<!--/*navbar is underneath this comment and connects all the pages together so you can click to the pages on the website
+and differentiates admins and regular users apart from each other and their access to certain pages
+*/-->
 <nav class="navbar navbar-expand-sm bg-danger">
     <div class="container-fluid">
         <a class="navbar-brand" href="#"><img src="https://media.giphy.com/media/dqC7qh15XHPsy4Ffdr/giphy.gif" height="100px"></a>
@@ -23,7 +26,7 @@
                 <?php
                 if (isset($_SESSION["FirstName"])) {
                     echo '<li class="nav-item" ><a class="nav-link" href = "orderForm.php"> Order Form </a ></li >';
-                    echo '<li class="nav-item" ><a class="nav-link" href = "invoiceList.php"> Invoice list</a ></li >';
+                    echo '<li class="nav-item" ><a class="nav-link" href = "invoice.php"> Invoice</a ></li >';
                 } else {
                     echo '<li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>';
                 }
@@ -37,7 +40,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="productAdd.php">Add Products</a></li>
-                                <li><a class="dropdown-item" href="productlist.php">Product List</a></li>
+                                <li><a class="dropdown-item" href="productList.php">Product List</a></li>
                             </ul>
                         </li>
                         <?php
@@ -54,11 +57,27 @@
         ?>
     </div>
 </nav>
+<!--notification centre-->
+<?php
+if (isset($_SESSION['flash_message'])) {
+    $message = $_SESSION['flash_message'];
+    unset($_SESSION['flash_message']);
+//    echo $message;
+    ?>
+    <div class="position-absolute bottom-0 end-0">
+        <?= $message ?>
+
+    </div>
+
+
+    <?php
+}
+?>
 <script src="js/bootstrap.bundle.min.js" ></script>
 <?php
 
 $conn = new SQLite3("DB") or die("unable to open database");
-//timezone stuff
+//timezone
 $productNames = array("product1"=>"Darth Vader Helmet", "product2"=>"Grogu Plush", "product3"=>"ROTJ Jigsaw", "product4"=>"Aftermath", "product5"=>"Alphabet Squadron");
 $productPrices= array("product1"=>299.0, "product2"=>32.95, "product3"=>219.95, "product4"=>24.95, "product5"=>24.95);
 function footer():string
@@ -75,6 +94,7 @@ function sanitiseData($unsanitisedData):string {
     $sanitisedData = htmlspecialchars($unsanitisedData);
     return $sanitisedData;
 }
+
 
 
 
