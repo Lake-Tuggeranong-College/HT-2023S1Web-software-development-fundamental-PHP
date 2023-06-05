@@ -1,138 +1,61 @@
-<?php include "template.php"
-/** @var $productNames */
-/** @var $productPrices */
-?>
-<title>Invoice</title>
-<body>
-
 <?php
+include "template.php";
+/**  @var $conn */
+/*
+ * The invoices page has a number of use cases to satisfy:
+        1. If user is not logged in, then redirect them to index.php
+        2. Users to view their "open" orders as a list.
+        3. Users to view invoices from individual orders (using the order variable in url, e.g `invoice.php?order=234`)
+        4. Inform users if they have not previously made any orders.
+        5. Administrators to view all orders
+        6. Administrators can OPEN and CLOSE orders
 
-$invoiceNumber = intval(sanitiseData ($_GET["invoiceNumber"]));
-echo $invoiceNumber;
-
-// Read the contents of the file
-$currentRow = 1;
-if (($handle = fopen("orders.csv", "r")) !== FALSE) {
-    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        if ($currentRow == $invoiceNumber) {
-            $currentRow++; //Add one to the current row
-
-// Customer Details
-            $cusNameFirst = $data[0];
-            $cusNameSecond = $data[1];
-            $cusAddress = $data[2];
-            $cusEmail = $data[3];
-            $cusPhone = $data[4];
-
-// Product Quantities
-            $prod1Quantity = $data[5];
-            $prod2Quantity = $data[6];
-            $prod3Quantity = $data[7];
-            $prod4Quantity = $data[8];
-            $prod5Quantity = $data[9];
+  @var $conn
+ */
+//checks to see if the user is not logged in, if they aren't logged in redirects user to home page
+if (!isset($_SESSION["CustomerID"])) {
+    // Case 1. The user is not logged in.
+    header("Location:index.php");
+}else{
+    if (empty($_GET["order"])) {
+        // Case 2 - no 'order' variable detected in the url.
+        $custID = $_SESSION['CustomerID'];
+        if ($_SESSION["AccessLevel"] == 1) {
+            // Case 5 - Generate a list of all invoices for administrators
+            $query = $conn->query("SELECT OrderNumber FROM Orders");
+            $count = $conn->querySingle("SELECT OrderNumber FROM Orders");
+        } else {
+            // Case 2 - Generate a list of open invoices for user
+            $query = $conn->query("SELECT OrderNumber FROM Orders WHERE CustomerID='$custID' AND Status='OPEN'");
+            $count = $conn->querySingle("SELECT OrderNumber FROM Orders WHERE customerID='$custID' AND status='OPEN'");
         }
-        $currentRow++; //Add one to the current row
+        $orderCodesForUser = [];
+        if ($count > 0) {  // Has the User made orders previously?
+            // Case 2: Display open orders
+            while ($data = $query->fetchArray()) {
+                $orderCode = $data[0];
+                array_push($orderCodesForUser, $orderCode);
+            }
+//Gets the unique order numbers from the extracted table above.
+            $unique_orders = array_unique($orderCodesForUser);
+            echo "<div class='container-fluid'>";
+// Produce a list of links of the Orders for the user.
+            foreach ($unique_orders as $order_ID) {
+                ?>
+                <div class='row'>
+                    <div class='col-12'><a href='invoice.php?order=<?= $order_ID ?>'>Order : <?= $order_ID ?></a></div>
+                </div>
+                <?php
+            }
+            echo "</div>";
+        } else {
+            // Case 4: No orders found for the logged in user.
+            echo "<div class='badge bg-danger text-wrap fs-5'>You don't have any open orders. Please make an order to view them</div>";
+
+        }
+    } else {
+        // Case 3 - 'order' variable detected.
+        $orderNumber = $_GET["order"];
+        $query = $conn->query("SELECT p.ProductName, p.ProductPrice, o.ProductQuantity, p.ProductPrice*o.ProductQuantity as SubTotal, o.OrderDate, o.Status FROM Orders o INNER JOIN Products p on o.ProductID = p.ProductID WHERE o.OrderNumber='$orderNumber'");
     }
-    fclose($handle); //closes the file
-           $prod1ItemCost = 3.4;
-        $prod2ItemCost = 5.0;
-        $prod3ItemCost = 12.54;
-        $prod4ItemCost = 19.77;
-        $prod5ItemCost = 1.01;
-
-        $prod1SubTotal = $prod1Quantity * $prod1ItemCost;
-        $prod2SubTotal = $prod2Quantity * $prod2ItemCost;
-        $prod3SubTotal = $prod3Quantity * $prod3ItemCost;
-        $prod4SubTotal = $prod4Quantity * $prod4ItemCost;
-        $prod5SubTotal = $prod5Quantity * $prod5ItemCost;
-        $invoiceTotal = $prod1SubTotal + $prod2SubTotal + $prod3SubTotal + $prod4SubTotal + $prod5SubTotal;
 }
-?>
-
-<!--Customer Details-->
-<h1 class="text-primary">Invoice</h1>
-<div class="container-fluid">
-
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="text-secondary">Customer Details</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6 text-primary">
-            Customer Name
-        </div>
-        <div class="col-md-6 text-bg-light">
-            <?= $cusNameFirst . " " . $cusNameSecond ?>
-        </div>
-        <div class="col-md-6 text-primary">
-            Address
-        </div>
-        <div class="col-md-6 text-bg-light">
-            <?= $cusAddress ?>
-        </div>
-
-        <div class="col-md-6 text-primary">
-            Email
-        </div>
-        <div class="col-md-6 text-bg-light">
-            <?= $cusEmail ?>
-        </div>
-
-        <div class="col-md-6 text-primary">
-            Phone
-        </div>
-        <div class="col-md-6 text-bg-light">
-            <?= $cusPhone ?>
-        </div>
-    </div>
-</div>
-<!--Products ordered -->
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12">
-            <h2 class="text-secondary">Products Ordered</h2>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-3">Product 1</div>
-        <div class="col-lg-3">$<?= $prod1ItemCost ?></div>
-        <div class="col-lg-3"><?= $prod1Quantity ?></div>
-        <div class="col-lg-3">$<?= $prod1SubTotal ?></div>
-    </div>
-    <div class="row">
-        <div class="col-lg-3">Product 2</div>
-        <div class="col-lg-3">$<?= $prod2ItemCost ?></div>
-        <div class="col-lg-3"><?= $prod2Quantity ?></div>
-        <div class="col-lg-3">$<?= $prod2SubTotal ?></div>
-    </div>
-    <div class="row">
-        <div class="col-lg-3">Product 3</div>
-        <div class="col-lg-3">$<?= $prod3ItemCost ?></div>
-        <div class="col-lg-3"><?= $prod3Quantity ?></div>
-        <div class="col-lg-3">$<?= $prod3SubTotal ?></div>
-    </div>
-    <div class="row">
-        <div class="col-lg-3">Product 4</div>
-        <div class="col-lg-3">$<?= $prod4ItemCost ?></div>
-        <div class="col-lg-3"><?= $prod4Quantity ?></div>
-        <div class="col-lg-3">$<?= $prod4SubTotal ?></div>
-    </div>
-    <div class="row">
-        <div class="col-lg-3">Product 5</div>
-        <div class="col-lg-3">$<?= $prod5ItemCost ?></div>
-        <div class="col-lg-3"><?= $prod5Quantity ?></div>
-        <div class="col-lg-3">$<?= $prod5SubTotal ?></div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <h2 class="text-secondary text-sm-end">$<?= $invoiceTotal ?></h2>
-        </div>
-    </div>
-</div>
-
-<?php echo footer() ?>
-</body>
-<script src="js/bootstrap.bundle.min.js"></script>
-</html>
