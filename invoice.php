@@ -16,7 +16,7 @@ include "template.php";
 if (!isset($_SESSION["CustomerID"])) {
     // Case 1. The user is not logged in.
     header("Location:index.php");
-}else{
+} else {
     if (empty($_GET["order"])) {
         // Case 2 - no 'order' variable detected in the url.
         $custID = $_SESSION['CustomerID'];
@@ -67,6 +67,24 @@ if (!isset($_SESSION["CustomerID"])) {
             <div class='col text-success display-6'>Subtotal</div>
         </div>
 
+        <?php
+        while ($data = $query->fetchArray()) {
+            echo "<div class='row'>";
+            $productName = $data["ProductName"];
+            $price = $data["ProductPrice"];
+            $quantity = $data["ProductQuantity"];
+            $subtotal = $data["SubTotal"];
+            $orderDate = $data["OrderDate"];
+            $status = $data["Status"];
+            $total = $total + $subtotal; // Running Total
+            echo "<div class='col'>" . $productName . "</div>";
+            echo "<div class='col'>$" . $price . "</div>";
+            echo "<div class='col'>" . $quantity . "</div>";
+            echo "<div class='col'>$" . $subtotal . "</div>";
+
+            echo "</div>";
+        }
+        ?>
         <!-- Invididual Rows here -->
 
         <div class='row'>
@@ -80,26 +98,7 @@ if (!isset($_SESSION["CustomerID"])) {
             <div class='col'><?= $orderDate ?></div>
         </div>
         <?php
-        while ($data = $query->fetchArray()) {
-            echo "<div class='row'>";
-            $productName = $data["ProductName"];
-            $price = $data["Price"];
-            $quantity = $data["Quantity"];
-            $subtotal = $data["SubTotal"];
-            $orderDate = $data["OrderDate"];
-            $status = $data["Status"];
-            $total = $total + $subtotal; // Running Total
-            echo "<div class='col'>" . $productName . "</div>";
-            echo "<div class='col'>$" . $price . "</div>";
-            echo "<div class='col'>" . $quantity . "</div>";
-            echo "<div class='col'>$" . $subtotal . "</div>";
-
-            echo "</div>";
-        }
-        ?>
-
-        <?php
-        if ($_SESSION["AccessLevel" == 1]) {
+        if ($_SESSION["AccessLevel"] == 1) {
             if (!empty($_GET["status"])) {
                 if ($_GET["status"] == "CLOSED") {
                     $conn->exec("UPDATE Orders SET status='CLOSED' WHERE OrderNumber='$orderNumber'");
@@ -108,13 +107,16 @@ if (!isset($_SESSION["CustomerID"])) {
                     $conn->exec("UPDATE Orders SET status='OPEN' WHERE OrderNumber='$orderNumber'");
                     $orderMessage = "Order #:" . $orderNumber . " has been re-opened";
                 }
-                if ($status == "OPEN") {
-                    echo "STATUS: OPEN";
-                    echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=CLOSED'>Click here to close</a></p>";
-                } else {
-                    echo "STATUS: CLOSED";
-                    echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=OPEN'>Click here to open</a></p>";
-                }
+            }
+            $query = $conn->query("SELECT  Status FROM Orders  WHERE OrderNumber='$orderNumber'");
+            $data = $query->fetchArray() ;
+            $status = $data ["Status"];
+            if ($status == "OPEN") {
+                echo "STATUS: OPEN";
+                echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=CLOSED'>Click here to close</a></p>";
+            } else {
+                echo "STATUS: CLOSED";
+                echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=OPEN'>Click here to open</a></p>";
             }
         }
     }
