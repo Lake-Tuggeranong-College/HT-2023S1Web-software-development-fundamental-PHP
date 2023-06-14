@@ -108,9 +108,11 @@ if (!isset($_SESSION["CustomerID"])) {
                     $orderMessage = "Order #:" . $orderNumber . " has been re-opened";
                 }
             }
+            //reloads page when change is made to OPEN/CLOSED status
             $query = $conn->query("SELECT  Status FROM Orders  WHERE OrderNumber='$orderNumber'");
             $data = $query->fetchArray() ;
             $status = $data ["Status"];
+            //changes status between OPEN and CLOSED
             if ($status == "OPEN") {
                 echo "STATUS: OPEN";
                 echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=CLOSED'>Click here to close</a></p>";
