@@ -6,10 +6,10 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-6">
-<p>username:haydonturner0@gmail.com</p>
-<p>password:haydon2006</p>
-<p>username:1234@gmail.com</p>
-<p>password:admin</p>
+<p>username: haydonturner0@gmail.com</p>
+<p>password: haydon2006</p>
+<p>username: 1234@gmail.com</p>
+<p>password: admin</p>
         </div>
         <div class="col-6">
             <?php if (!isset($_SESSION["EmailAddress"])) : ?>
