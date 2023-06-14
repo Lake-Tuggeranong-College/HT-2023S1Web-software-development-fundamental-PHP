@@ -45,8 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       //  fclose($csvFile);
     }
 ?>
-
-?>
 <?php echo footer() ?>
 </body>
 </html>

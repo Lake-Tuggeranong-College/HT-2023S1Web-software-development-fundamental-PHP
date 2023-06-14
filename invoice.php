@@ -16,7 +16,7 @@ include "template.php";
 if (!isset($_SESSION["CustomerID"])) {
     // Case 1. The user is not logged in.
     header("Location:index.php");
-}else{
+} else {
     if (empty($_GET["order"])) {
         // Case 2 - no 'order' variable detected in the url.
         $custID = $_SESSION['CustomerID'];
@@ -57,5 +57,69 @@ if (!isset($_SESSION["CustomerID"])) {
         // Case 3 - 'order' variable detected.
         $orderNumber = $_GET["order"];
         $query = $conn->query("SELECT p.ProductName, p.ProductPrice, o.ProductQuantity, p.ProductPrice*o.ProductQuantity as SubTotal, o.OrderDate, o.Status FROM Orders o INNER JOIN Products p on o.ProductID = p.ProductID WHERE o.OrderNumber='$orderNumber'");
+        $total = 0;
+        ?>
+        <div class='container-fluid'>
+        <div class='row'>
+            <div class='col text-success display-6'>Product Name</div>
+            <div class='col text-success display-6'>Price</div>
+            <div class='col text-success display-6'>Quantity</div>
+            <div class='col text-success display-6'>Subtotal</div>
+        </div>
+
+        <?php
+        while ($data = $query->fetchArray()) {
+            echo "<div class='row'>";
+            $productName = $data["ProductName"];
+            $price = $data["ProductPrice"];
+            $quantity = $data["ProductQuantity"];
+            $subtotal = $data["SubTotal"];
+            $orderDate = $data["OrderDate"];
+            $status = $data["Status"];
+            $total = $total + $subtotal; // Running Total
+            echo "<div class='col'>" . $productName . "</div>";
+            echo "<div class='col'>$" . $price . "</div>";
+            echo "<div class='col'>" . $quantity . "</div>";
+            echo "<div class='col'>$" . $subtotal . "</div>";
+
+            echo "</div>";
+        }
+        ?>
+        <!-- Invididual Rows here -->
+
+        <div class='row'>
+            <div class='col'></div>
+            <div class='col'></div>
+            <div class='col display-6'>Total : $<?= $total ?></div>
+        </div>
+        <div class='row'>
+            <div class='col'></div>
+            <div class='col'></div>
+            <div class='col'><?= $orderDate ?></div>
+        </div>
+        <?php
+        if ($_SESSION["AccessLevel"] == 1) {
+            if (!empty($_GET["status"])) {
+                if ($_GET["status"] == "CLOSED") {
+                    $conn->exec("UPDATE Orders SET status='CLOSED' WHERE OrderNumber='$orderNumber'");
+                    $orderMessage = "Order #:" . $orderNumber . " has been closed";
+                } else {
+                    $conn->exec("UPDATE Orders SET status='OPEN' WHERE OrderNumber='$orderNumber'");
+                    $orderMessage = "Order #:" . $orderNumber . " has been re-opened";
+                }
+            }
+            //reloads page when change is made to OPEN/CLOSED status
+            $query = $conn->query("SELECT  Status FROM Orders  WHERE OrderNumber='$orderNumber'");
+            $data = $query->fetchArray() ;
+            $status = $data ["Status"];
+            //changes status between OPEN and CLOSED
+            if ($status == "OPEN") {
+                echo "STATUS: OPEN";
+                echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=CLOSED'>Click here to close</a></p>";
+            } else {
+                echo "STATUS: CLOSED";
+                echo "<p><a href='invoice.php?order=" . $orderNumber . "&status=OPEN'>Click here to open</a></p>";
+            }
+        }
     }
 }
